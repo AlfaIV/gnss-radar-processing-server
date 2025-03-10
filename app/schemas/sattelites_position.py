@@ -7,9 +7,10 @@ class RadarPositionRequest(BaseModel):
     radar_z: int
 
 class SatellitePosition(BaseModel):
+    Group: str
     Name: str
-    Azimuth: int
-    Range: int
+    Azimuth: float
+    Range: float
 
 class SatellitesPositionResponce(BaseModel):
     Satellites: List[SatellitePosition]

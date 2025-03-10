@@ -24,10 +24,14 @@ class SatellitesPositions:
                     self.TLE_array[-1].line2 = line
                 else:
                     self.TLE_array.append(TLE(line))
+                    print(f'name: {self.TLE_array[-1].name}')
         
         self.satellites = []
         for tle in self.TLE_array:
-            self.satellites.append(Satrec.twoline2rv(tle.line1, tle.line2))
+            self.satellites.append({
+                'satrec': Satrec.twoline2rv(tle.line1, tle.line2),
+                                     'tle': tle
+                                     })
         
     
     def get_sattelites_positions(self, radar: RadarPositionRequest) -> SatellitesPositionResponce:
@@ -42,10 +46,20 @@ class SatellitesPositions:
         satellite_positions = []
 
         for satellite in self.satellites:
-            satellite_positions.append(self.get_sattelite_positions(current_time, satellite, radar_position))
+            sattelite_props = self.get_sattelite_positions(current_time, satellite['satrec'], radar_position)
+            name = satellite['tle'].name.strip()
+            parts = name.split()
+            grouping = parts[0]
+            satellite_name = " ".join(parts[1:])
+            satellite_positions.append({
+                'Group': grouping,
+                'Name': satellite_name,
+                'Azimuth': round(sattelite_props['Azimuth'].degree, 2),
+                'Range': round(sattelite_props['Range'].km, 2),
+                })
 
         return {
-            'Satellites': []
+            'Satellites': satellite_positions
         }
 
     def get_sattelite_positions(self, current_time: datetime, satellite: object, observer: RadarPositionRequest) -> SatellitePosition:
@@ -91,8 +105,6 @@ class SatellitesPositions:
         print(f"Дальность до спутника: {distance.to(u.km):.2f} километров")
 
         return {
-            # 'Name': satellite.name,
-            'Name': '1213',
             'Azimuth': azimuth,
             'Range': distance,
             'Elevation': elevation,

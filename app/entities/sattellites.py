@@ -32,7 +32,6 @@ class TLE:
         self._line2 = value
 
 class SatellitePosition(BaseModel):
-    Name: str
     Azimuth: int
     Elevation: int
     Range: int
