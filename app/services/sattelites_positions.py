@@ -1,34 +1,54 @@
+import os
+from app.core.config import configs
+
 from astropy.time import Time
 from astropy import units as u
 from sgp4.api import Satrec
-from astropy.coordinates import TEME, CartesianDifferential, CartesianRepresentation, EarthLocation, ITRS, SkyCoord, AltAz, Distance
+from astropy.coordinates import TEME, CartesianDifferential, CartesianRepresentation, EarthLocation, ITRS, AltAz, Distance
+
+from app.schemas.sattelites_position import RadarPositionRequest, SatellitesPositionResponce
+from app.entities.sattellites import TLE, SatellitePosition, SatellitesPosition
+from datetime import datetime
 import numpy as np
 
 class SatellitesPositions:
     def __init__(self):
-        self.satellites_positions = {}
-        self.satellites_names = []
-        self.sattelites_count = 0
-        self.satellites_names.append("A")
-        self.satellites_names.append("B")
-    
-    def get_sattelites_positions(self):
-        
-        tle_file = 'datasets\TLE\gps.tle'
+        tle_file = os.path.join(configs.PROJECT_ROOT ,'app' ,'services' ,'tle' ,'gps.tle')
+        self.TLE_array = []
         with open(tle_file, 'r') as file:
-            TLE_array = []
             for line in file:
                 words = line.split()
                 if (words[0] == '1'):
-                    TLE_array[-1].line1 = line
+                    self.TLE_array[-1].line1 = line
                 elif (words[0] == '2'):
-                    TLE_array[-1].line2 = line
+                    self.TLE_array[-1].line2 = line
                 else:
-                    TLE_array.append(TLE(line))
+                    self.TLE_array.append(TLE(line))
         
-        satellite = Satrec.twoline2rv(TLE_array[-1].line1, TLE_array[-1].line2)
-        # получиить время пргедсказания
+        self.satellites = []
+        for tle in self.TLE_array:
+            self.satellites.append(Satrec.twoline2rv(tle.line1, tle.line2))
+        
+    
+    def get_sattelites_positions(self, radar: RadarPositionRequest) -> SatellitesPositionResponce:
         current_time = Time.now()
+        
+        radar_position = {
+            'radar_x': 2842957.63,
+            'radar_y': 2160952.62,
+            'radar_z': 5265993.63,
+        }
+
+        satellite_positions = []
+
+        for satellite in self.satellites:
+            satellite_positions.append(self.get_sattelite_positions(current_time, satellite, radar_position))
+
+        return {
+            'Satellites': []
+        }
+
+    def get_sattelite_positions(self, current_time: datetime, satellite: object, observer: RadarPositionRequest) -> SatellitePosition:
         error_code, teme_p, teme_v = satellite.sgp4(current_time.jd1, current_time.jd2)  # in km and km/s
         if error_code != 0:
             raise RuntimeError(SGP4_ERRORS[error_code])
@@ -41,37 +61,44 @@ class SatellitesPositions:
         location = itrs_geo.earth_location
         location.geodetic 
 
-        # Определение позиции наблюдателя на Земле
-        observer_lat = 52 * u.deg  # Широта наблюдателя (например, Москва)
-        observer_lon = 38 * u.deg  # Долгота наблюдателя
-        observer_height = 0 * u.km  # Высота над уровнем моря
+        observer_x = observer['radar_x']
+        observer_y = observer['radar_y']
+        observer_z = observer['radar_z']
 
-        # Конвертация широты/долготы наблюдателя в ITRS
-        observer_location = EarthLocation.from_geodetic(observer_lon, observer_lat, observer_height)
+        observer_location = EarthLocation.from_geocentric(observer_x, observer_y, observer_z, unit='m')
         observer_itrs = observer_location.get_itrs(obstime=current_time)
 
-        # Нахождение угла между наблюдателем и спутником
         separation_angle = observer_itrs.separation(itrs_geo)
 
-        # Вывод результата
         print(f"Угол между наблюдателем и спутником: {separation_angle.to(u.deg):.2f} градусов")
 
-        # Преобразование в AltAz для получения азимута и угла места
         altaz_frame = AltAz(obstime=current_time, location=observer_location)
         satellite_altaz = itrs_geo.transform_to(altaz_frame)
 
-        # Получение азимута и угла места
         azimuth = satellite_altaz.az
         elevation = satellite_altaz.alt
 
         print(f"Азимут: {azimuth.to(u.deg):.2f} градусов")
         print(f"Угол места: {elevation.to(u.deg):.2f} градусов")    
 
-        # Вычисление евклидова расстояния
+
         distance_value = np.sqrt((itrs_geo.x - observer_itrs.x)**2 + 
                                 (itrs_geo.y - observer_itrs.y)**2 + 
                                 (itrs_geo.z - observer_itrs.z)**2)
-        # Создание объекта Distance
+        
         distance = Distance(value=distance_value, unit = u.m)  # Преобразуем в метры
 
         print(f"Дальность до спутника: {distance.to(u.km):.2f} километров")
+
+        return {
+            # 'Name': satellite.name,
+            'Name': '1213',
+            'Azimuth': azimuth,
+            'Range': distance,
+            'Elevation': elevation,
+        }
+
+    
+    def __del__(self):
+        self.TLE_array = []
+        self.satellites = []

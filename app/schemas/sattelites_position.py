@@ -1,16 +1,15 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Union
 
-class RadarPosition(BaseModel):
-    RadarX: int
-    RadarY: int
-    RadarZ: int
-    RadarID: int
+class RadarPositionRequest(BaseModel):
+    radar_x: int
+    radar_y: int
+    radar_z: int
 
 class SatellitePosition(BaseModel):
     Name: str
     Azimuth: int
     Range: int
 
-class SatellitesPosition(BaseModel):
+class SatellitesPositionResponce(BaseModel):
     Satellites: List[SatellitePosition]

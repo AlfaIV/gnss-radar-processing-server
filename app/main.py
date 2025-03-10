@@ -1,26 +1,3 @@
-# from fastapi import FastAPI
-# from starlette.middleware.cors import CORSMiddleware
-
-# from app.core.container import Container
-# from app.interfaces.http import router
-
-# container = Container()
-# container.config.from_yaml('config.yml')
-# container.wire(modules=[__name__, 'app'])
-
-# app = container.fastapi_app()
-
-# app.include_router(router)
-
-# if __name__ == '__main__':
-#     import uvicorn
-#     uvicorn.run(app, host='0.0.0.0', port=8000)
-
-# from fastapi import FastAPI
-
-# app = FastAPI()
-
-
 from fastapi import FastAPI
 
 from app.api.v1.routes import routers as v1_routers

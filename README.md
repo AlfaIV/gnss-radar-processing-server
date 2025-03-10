@@ -2,6 +2,6 @@
 Если запуск происходит в Windows
 ```bash
     python -m venv venv
-    .\venv\Scripts\Activate.ps1
-
+    .\venv\scripts\activate.ps1
+    fastapi.exe dev .\app\main.py
 ```

@@ -1,21 +1,26 @@
 
 from fastapi import APIRouter, Depends
+from typing import List
 
-from app.schemas.sattelites_position import RadarPosition, SatellitesPosition
+from app.services.sattelites_positions import SatellitesPositions
+from app.schemas.sattelites_position import RadarPositionRequest, SatellitesPositionResponce
 
 router = APIRouter(
     prefix="/satellites",
     tags=["auth"],
 )
 
-@router.get('/now', response_model=SatellitesPosition)
-def get_sattelites():
-    return {
-        'Satellites': [
-            {
-                'Name': '123',
-                'Azimuth': 10,
-                'Range': 10,
-            }
-        ]
-    }
+@router.post('/now', response_model=SatellitesPositionResponce)
+def post_sattelites(radar: RadarPositionRequest):
+    service = SatellitesPositions()
+    return service.get_sattelites_positions(radar)
+    # return {'Satellites': []}
+    # return {
+    #     'Satellites': [
+    #         {
+    #             'Name': '123',
+    #             'Azimuth': 10,
+    #             'Range': 10,
+    #         }
+    #     ]
+    # }
