@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from app.api.v1.routes import routers as v1_routers
 from app.core.config import configs
+from app.core.container import Container
 
 class AppCreator:
     def __init__(self):
@@ -12,6 +13,8 @@ class AppCreator:
             version="0.0.1",
         )
 
+        self.container = Container()
+
         # set routes
         @self.app.get("/")
         async def root():
@@ -21,3 +24,4 @@ class AppCreator:
 
 app_creator = AppCreator()
 app = app_creator.app
+container = app_creator.container

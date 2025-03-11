@@ -109,8 +109,3 @@ class SatellitesPositions:
             'Range': distance,
             'Elevation': elevation,
         }
-
-    
-    def __del__(self):
-        self.TLE_array = []
-        self.satellites = []
