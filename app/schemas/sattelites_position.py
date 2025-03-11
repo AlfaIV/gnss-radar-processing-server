@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Union
+from typing import List
 
 class RadarPositionRequest(BaseModel):
     radar_x: int
@@ -12,5 +12,13 @@ class SatellitePosition(BaseModel):
     Azimuth: float
     Range: float
 
+class Ephemeris(BaseModel):
+    Group: str
+    Name: str
+    Longitude: float
+    Latitude: float
+    Height: float
+
 class SatellitesPositionResponce(BaseModel):
     Satellites: List[SatellitePosition]
+    Ephemerises: List[Ephemeris]

@@ -6,7 +6,6 @@ from app.core.container import Container
 
 class AppCreator:
     def __init__(self):
-        # set app default
         self.app = FastAPI(
             title=configs.PROJECT_NAME,
             openapi_url=f"{configs.API}/openapi.json",
@@ -15,7 +14,6 @@ class AppCreator:
 
         self.container = Container()
 
-        # set routes
         @self.app.get("/")
         async def root():
             return f"{configs.PROJECT_NAME} service is working"
