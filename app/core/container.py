@@ -1,5 +1,7 @@
 from dependency_injector import containers, providers
+
 from app.services.sattelites_positions import SatellitesPositions
+
 
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(

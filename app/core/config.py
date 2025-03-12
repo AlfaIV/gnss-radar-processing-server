@@ -1,5 +1,4 @@
 import os
-from typing import List
 
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
@@ -16,7 +15,9 @@ class Configs(BaseSettings):
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "measurement-services"
 
-    PROJECT_ROOT: str = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    PROJECT_ROOT: str = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    )
 
     # date
     DATETIME_FORMAT: str = "%Y-%m-%dT%H:%M:%S"

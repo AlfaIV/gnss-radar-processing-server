@@ -9,3 +9,5 @@ venv/
 .env
 .git/
 .DS_Store
+.ruff_cache
+.mypy_cache
