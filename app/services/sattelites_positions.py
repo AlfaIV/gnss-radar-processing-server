@@ -24,7 +24,6 @@ class SatellitesPositions:
                     self.TLE_array[-1].line2 = line
                 else:
                     self.TLE_array.append(TLE(line))
-                    print(f'name: {self.TLE_array[-1].name}')
         
         self.satellites = []
         for tle in self.TLE_array:
