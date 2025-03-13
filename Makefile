@@ -15,9 +15,9 @@ setup:
 run:
 	$(PYTHON) -m uvicorn app.main:app --reload
 
-# Запуск тестов
-test:
-	$(PYTHON) -m pytest tests/
+# Создание пре-коммитов
+format:
+	$(PYTHON) -m pre-commit install
 
 # Форматирование кода с помощью black и isort
 format:

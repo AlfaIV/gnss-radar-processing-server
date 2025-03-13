@@ -15,3 +15,9 @@
     docker build -t measurement_services .
     docker run -d -p 8010:8000 --name measurement_services_container measurement_services —network gnss-radar-net
 ```
+
+Для формирования пре-коммитов можно использовать:
+
+```bash
+    pre-commit install
+```
